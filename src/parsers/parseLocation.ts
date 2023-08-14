@@ -1,5 +1,4 @@
-import { DataStale } from '../OVMSClient';
-
+import { DataStale } from '../data-stale';
 export interface LocationResponse {
   latitude?: number;
   longitude?: number;

@@ -2,7 +2,7 @@ import net from 'net';
 import crypto from 'crypto';
 import { EventEmitter } from 'events';
 import debug from 'debug';
-import { parseTPMS } from './parsers/parseTPMS';
+import { parseLegacyTPMS, parseTPMS } from './parsers/parseTPMS';
 import { parseEnvironment } from './parsers/parseEnvironment';
 import { parseFirmware } from './parsers/parseFirmware';
 import { parseStatus } from './parsers/parseStatus';
@@ -10,11 +10,6 @@ import { parseLocation } from './parsers/parseLocation';
 
 const log = debug('OVMS');
 const b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-export enum DataStale {
-  NoValue,
-  Stale,
-  Good,
-}
 
 export class OVMSClient extends EventEmitter {
   private socket = new net.Socket();
@@ -77,9 +72,13 @@ export class OVMSClient extends EventEmitter {
       }
     } else {
       const msgs = res.split('\r\n');
-      msgs.forEach(msg => {
+      msgs.forEach((msg) => {
         this.handleMessage(
-          this.decipher!.update(Buffer.from(msg, 'base64'), 'binary', 'utf8')
+          this.decipher!.update(
+            Buffer.from(msg, 'base64').toString(),
+            'binary',
+            'utf8'
+          )
         );
       });
     }
@@ -118,7 +117,14 @@ export class OVMSClient extends EventEmitter {
       case 'D':
         this.emit('environment', parseEnvironment(message));
         break;
+      /**
+       * @deprecated
+       * Deprecated in favor of Y, see https://docs.openvehicles.com/en/latest/protocol_v2/messages.html#car-tpms-message-0x57-w-old-obsolete
+       */
       case 'W':
+        this.emit('old-tpms', parseLegacyTPMS(message));
+        break;
+      case 'Y':
         this.emit('tpms', parseTPMS(message));
         break;
       case 'a':
