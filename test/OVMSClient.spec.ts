@@ -1,4 +1,4 @@
-import { OVMSClient } from '../src';
+import { FirmwareResponse, OVMSClient } from '../src';
 
 jest.setTimeout(30000);
 
@@ -6,7 +6,7 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe('OVMSClient', () => {
   let client: OVMSClient;
-  let firmware: string;
+  let firmware: FirmwareResponse;
 
   beforeAll(() => {
     client = new OVMSClient('tmc.openvehicles.com', 6867, 'DEMO', 'DEMO');
@@ -24,7 +24,7 @@ describe('OVMSClient', () => {
     let connected;
     client.connect();
 
-    client.on('firmware', (fw: string) => {
+    client.on('firmware', (fw) => {
       firmware = fw;
     });
 

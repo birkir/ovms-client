@@ -1,20 +1,6 @@
 import { DataStale } from '../data-stale';
-export interface LocationResponse {
-  latitude?: number;
-  longitude?: number;
-  direction?: number;
-  altitude?: number;
-  gpsLockRaw?: number;
-  gpsLock?: boolean;
-  staleGpsRaw?: number;
-  staleGps?: DataStale;
-  speedRaw?: number;
-  tripmeterRaw?: number;
-  driveMode?: number;
-  power?: number;
-  energyUsed?: number;
-  energyRecd?: number;
-}
+import { LocationResponse } from '../models';
+
 
 export function parseLocation(message: string) {
   const parts = message.split(',');

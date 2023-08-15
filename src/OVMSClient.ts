@@ -1,17 +1,40 @@
 import net from 'net';
 import crypto from 'crypto';
 import { EventEmitter } from 'events';
+import TypedEmitter from "typed-emitter"
 import debug from 'debug';
 import { parseLegacyTPMS, parseTPMS } from './parsers/parseTPMS';
 import { parseEnvironment } from './parsers/parseEnvironment';
 import { parseFirmware } from './parsers/parseFirmware';
 import { parseStatus } from './parsers/parseStatus';
 import { parseLocation } from './parsers/parseLocation';
+import { EnvironmentResponse, FirmwareResponse, LocationResponse, StatusResponse, TPMSResponse } from './models';
 
 const log = debug('OVMS');
 const b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
-export class OVMSClient extends EventEmitter {
+type Events = {
+  location: (data: LocationResponse) => void;
+  status: (data: StatusResponse) => void;
+  firmware: (data: FirmwareResponse) => void;
+  environment: (data: EnvironmentResponse) => void;
+  'old-tpms': (data: TPMSResponse) => void;
+  tpms: (data: TPMSResponse) => void;
+  raw: (data: string) => void;
+  serverAck: (data: string) => void;
+  commandReceived: (data: string) => void;
+  pushNotification: (data: string) => void;
+  carsConnected: (data: number) => void;
+  lastUpdated: (data: Date) => void;
+  message: (data: string) => void;
+  connected: () => void;
+  closed: () => void;
+  error: (err: Error) => void;
+}
+
+type OVMSEvents = TypedEmitter<Events>;
+
+export class OVMSClient extends (EventEmitter as new () => OVMSEvents) {
   private socket = new net.Socket();
   private clientToken: string;
 
@@ -75,7 +98,7 @@ export class OVMSClient extends EventEmitter {
       msgs.forEach((msg) => {
         this.handleMessage(
           this.decipher!.update(
-            Buffer.from(msg, 'base64').toString(),
+            Buffer.from(msg, 'base64') as any,
             'binary',
             'utf8'
           )

@@ -1,49 +1,6 @@
 import { DataStale } from '../data-stale';
+import { EnvironmentResponse } from '../models';
 
-export interface EnvironmentResponse {
-  doors1Raw?: number;
-  frontLeftDoorOpen?: boolean;
-  frontRightDoorOpen?: boolean;
-  chargePortOpen?: boolean;
-  pilotPresent?: boolean;
-  charging?: boolean;
-  handbrakeOn?: boolean;
-  started?: boolean;
-  doors2Raw?: number;
-  bonnetOpen?: boolean;
-  trunkOpen?: boolean;
-  headlightsOn?: boolean;
-  valetMode?: boolean;
-  locked?: boolean;
-  lockUnlockRaw?: number;
-  tempPemRaw?: number;
-  tempMotorRaw?: number;
-  tempBatteryRaw?: number;
-  tripMeterRaw?: number;
-  odometerRaw?: number;
-  speedRaw?: number;
-  parkedTime?: Date;
-  parkedDurationSeconds?: number;
-  tempAmbientRaw?: number;
-  doors3Raw?: number;
-  awake?: boolean;
-  staleCarTempsRaw?: number;
-  staleCarTemps?: DataStale;
-  staleAmbientTempRaw?: number;
-  staleAmbientTemp?: DataStale;
-  lineVoltage12v?: number;
-  doors4Raw?: number;
-  alarmSounding?: boolean;
-  lineRef12v?: number;
-  doors5Raw?: number;
-  charging12v?: boolean;
-  rearLeftDoorOpen?: boolean;
-  rearRightDoorOpen?: boolean;
-  tempChargerRaw?: number;
-  current12v?: number;
-  tempCabinRaw?: number;
-  hvacRunning?: boolean;
-}
 
 /**
  * Parse the environment message

@@ -1,14 +1,4 @@
-export interface FirmwareResponse {
-  firmware?: string;
-  vin?: string;
-  gsmSignalRaw?: number;
-  gsmDbm?: number;
-  gsmSignal?: string;
-  gsmBars?: number;
-  gsmLock?: string;
-  writeEnabled?: boolean;
-  type?: string;
-}
+import { FirmwareResponse } from '../models';
 
 export function parseFirmware(message: string) {
   const parts = message.split(',');
