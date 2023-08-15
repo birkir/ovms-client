@@ -9,6 +9,9 @@
   "files": [
     "dist"
   ],
+  "engines": {
+    "node": "^16.0.0"
+  },
   "scripts": {
     "start": "dts watch",
     "build": "dts build",
