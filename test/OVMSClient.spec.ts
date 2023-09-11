@@ -1,12 +1,12 @@
-import { OVMSClient } from '../src';
+import { FirmwareResponse, OVMSClient } from '../src';
 
 jest.setTimeout(30000);
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe('OVMSClient', () => {
   let client: OVMSClient;
-  let firmware: string;
+  let firmware: FirmwareResponse;
 
   beforeAll(() => {
     client = new OVMSClient('tmc.openvehicles.com', 6867, 'DEMO', 'DEMO');
@@ -24,11 +24,11 @@ describe('OVMSClient', () => {
     let connected;
     client.connect();
 
-    client.on('firmware', (fw: string) => {
+    client.on('firmware', (fw) => {
       firmware = fw;
     });
 
-    await new Promise(resolve => {
+    await new Promise<void>((resolve) => {
       client.on('connected', () => {
         connected = true;
         resolve();
@@ -46,7 +46,7 @@ describe('OVMSClient', () => {
   it('should be able to ping', async () => {
     await delay(100);
     client.sendRaw('MP-0 A');
-    const ack = await new Promise(resolve =>
+    const ack = await new Promise((resolve) =>
       client.on('serverAck', () => resolve(true))
     );
     expect(ack).toBe(true);
@@ -55,7 +55,7 @@ describe('OVMSClient', () => {
   it('should be able to send messages', async () => {
     await delay(100);
     client.send('stat');
-    const status = await new Promise(resolve => client.on('status', resolve));
+    const status = await new Promise((resolve) => client.on('status', resolve));
     expect(status).toBeTruthy();
   });
 });

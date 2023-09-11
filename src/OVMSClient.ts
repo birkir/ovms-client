@@ -1,22 +1,40 @@
 import net from 'net';
 import crypto from 'crypto';
 import { EventEmitter } from 'events';
+import TypedEmitter from "typed-emitter"
 import debug from 'debug';
-import { parseTPMS } from './parsers/parseTPMS';
+import { parseLegacyTPMS, parseTPMS } from './parsers/parseTPMS';
 import { parseEnvironment } from './parsers/parseEnvironment';
 import { parseFirmware } from './parsers/parseFirmware';
 import { parseStatus } from './parsers/parseStatus';
 import { parseLocation } from './parsers/parseLocation';
+import { EnvironmentResponse, FirmwareResponse, LocationResponse, StatusResponse, TPMSResponse } from './models';
 
 const log = debug('OVMS');
 const b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-export enum DataStale {
-  NoValue,
-  Stale,
-  Good,
+
+type Events = {
+  location: (data: LocationResponse) => void;
+  status: (data: StatusResponse) => void;
+  firmware: (data: FirmwareResponse) => void;
+  environment: (data: EnvironmentResponse) => void;
+  'old-tpms': (data: TPMSResponse) => void;
+  tpms: (data: TPMSResponse) => void;
+  raw: (data: string) => void;
+  serverAck: (data: string) => void;
+  commandReceived: (data: string) => void;
+  pushNotification: (data: string) => void;
+  carsConnected: (data: number) => void;
+  lastUpdated: (data: Date) => void;
+  message: (data: string) => void;
+  connected: () => void;
+  closed: () => void;
+  error: (err: Error) => void;
 }
 
-export class OVMSClient extends EventEmitter {
+type OVMSEvents = TypedEmitter<Events>;
+
+export class OVMSClient extends (EventEmitter as new () => OVMSEvents) {
   private socket = new net.Socket();
   private clientToken: string;
 
@@ -77,9 +95,13 @@ export class OVMSClient extends EventEmitter {
       }
     } else {
       const msgs = res.split('\r\n');
-      msgs.forEach(msg => {
+      msgs.forEach((msg) => {
         this.handleMessage(
-          this.decipher!.update(Buffer.from(msg, 'base64'), 'binary', 'utf8')
+          this.decipher!.update(
+            Buffer.from(msg, 'base64') as any,
+            'binary',
+            'utf8'
+          )
         );
       });
     }
@@ -118,7 +140,14 @@ export class OVMSClient extends EventEmitter {
       case 'D':
         this.emit('environment', parseEnvironment(message));
         break;
+      /**
+       * @deprecated
+       * Deprecated in favor of Y, see https://docs.openvehicles.com/en/latest/protocol_v2/messages.html#car-tpms-message-0x57-w-old-obsolete
+       */
       case 'W':
+        this.emit('old-tpms', parseLegacyTPMS(message));
+        break;
+      case 'Y':
         this.emit('tpms', parseTPMS(message));
         break;
       case 'a':
