@@ -1,0 +1,6 @@
+{
+  "host":         "api.openvehicles.com",
+  "port":         6867,
+  "vehicleid":    "DEMO",
+  "password":     "DEMO"
+}
