@@ -1,21 +1,6 @@
-import { DataStale } from '../OVMSClient';
+import { DataStale } from '../data-stale';
+import { LocationResponse } from '../models';
 
-export interface LocationResponse {
-  latitude?: number;
-  longitude?: number;
-  direction?: number;
-  altitude?: number;
-  gpsLockRaw?: number;
-  gpsLock?: boolean;
-  staleGpsRaw?: number;
-  staleGps?: DataStale;
-  speedRaw?: number;
-  tripmeterRaw?: number;
-  driveMode?: number;
-  power?: number;
-  energyUsed?: number;
-  energyRecd?: number;
-}
 
 export function parseLocation(message: string) {
   const parts = message.split(',');
